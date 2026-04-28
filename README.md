@@ -9,5 +9,7 @@ Valorizar a cultura potiguar, tornando visível tanto para moradores locais como
 
 ## Tecnologias
 - Angular
+- PrimeNG
+- Tailwind CSS
 - Git e Github
 
