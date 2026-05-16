@@ -18,6 +18,14 @@ interface Arte{
   foto: string;
 }
 
+interface Forms {
+  id?: number;
+  name: string;
+  tipo: Tipo | null;
+  description: string;
+  foto: string;
+}
+
 @Component({
   selector: 'app-root',
   imports: [CommonModule, FormsModule, InputTextModule, IftaLabelModule, ButtonModule, CardModule, SelectModule, DividerModule],
@@ -29,30 +37,30 @@ interface Arte{
 
   <div class="card flex justify-center m-4">
             <p-iftalabel>
-                <input pInputText id="username" [(ngModel)]="arte.name" autocomplete="off" />
+                <input pInputText id="username" [ngModel]="FormModel().name" (ngModelChange)="updateForm('name', $event)" autocomplete="off" />
                 <label for="username">Nome</label>
             </p-iftalabel>
   </div>
   <div class="card flex justify-center">
-            <p-select [options]="tipos" [(ngModel)]="selectedTipo" [checkmark]="true" optionLabel="name" [showClear]="true" placeholder="Select a Tipo" class="w-full md:w-56" />
+              <p-select [options]="tipos" [ngModel]="FormModel().tipo" (ngModelChange)="updateForm('tipo', $event)" [checkmark]="true" optionLabel="name" [showClear]="true" placeholder="Select a Tipo" class="w-full md:w-56" />
   </div>
   <div class="card flex justify-center m-4">
             <p-iftalabel>
-                <input pInputText id="description" [(ngModel)]="arte.description" autocomplete="off" />
+                <input pInputText id="description" [ngModel]="FormModel().description" (ngModelChange)="updateForm('description', $event)" autocomplete="off" />
                 <label for="description">Descrição</label>
             </p-iftalabel>
   </div>
   <div class="card flex justify-center m-4">
             <p-iftalabel>
-                <input pInputText id="foto" [(ngModel)]="arte.foto" autocomplete="off" />
+                <input pInputText id="foto" [ngModel]="FormModel().foto" (ngModelChange)="updateForm('foto', $event)" autocomplete="off" />
                 <label for="foto">Foto</label>
             </p-iftalabel>
   </div>
   <div class="card flex justify-center m-4">
-            <p-button label="{{ arte.id ? 'Atualizar' : 'Salvar' }}" (click)="save()" />
+              <p-button label="{{ FormModel().id ? 'Atualizar' : 'Salvar' }}" (click)="save()" />
   </div>
 
-  <div *ngIf="arte.id" class="card flex justify-center m-4">
+          <div *ngIf="FormModel().id" class="card flex justify-center m-4">
             <p-button severity="secondary" label="Cancelar" (click)="resetForm()" />
   </div>
   <ul>
@@ -88,22 +96,29 @@ export class App implements OnInit {
   protected readonly title = signal('atelie');
   private readonly storageKey = 'atelie-artes';
 
+  FormModel = signal<Forms>({ 
+    id: undefined,
+    name: '', 
+    tipo: null, 
+    description: '',
+    foto: '' 
+  });
+
   tipos: Tipo[] = [];
-  selectedTipo: Tipo | undefined;
   artes: Arte[] = [];
 
   private nextId = 1;
 
-  arte: Arte = {
-    name: '',
-    tipo: '',
-    description: '',
-    foto: ''
-  };
-
   ngOnInit(): void {
     this.loadArtes();
     this.tipos = [ { name: 'Pintura' }, { name: 'Escultura' }, { name: 'Fotografia' }, { name: 'Desenho' }, { name: 'Cerâmica' } ];
+  }
+
+  updateForm<K extends keyof Forms>(field: K, value: Forms[K]) {
+    this.FormModel.update((form) => ({
+      ...form,
+      [field]: value
+    }));
   }
 
   loadArtes() {
@@ -125,14 +140,21 @@ export class App implements OnInit {
   }
 
   save() {
-    this.arte.tipo = this.selectedTipo?.name || '';
+    const form = this.FormModel();
+    const arteToSave: Arte = {
+      id: form.id,
+      name: form.name,
+      tipo: form.tipo?.name ?? '',
+      description: form.description,
+      foto: form.foto
+    };
 
-    if (this.arte.id) {
+    if (arteToSave.id) {
       this.artes = this.artes.map((arte) =>
-        arte.id === this.arte.id ? { ...this.arte } : arte
+        arte.id === arteToSave.id ? { ...arteToSave } : arte
       );
     } else {
-      this.artes = [...this.artes, { ...this.arte, id: this.nextId }];
+      this.artes = [...this.artes, { ...arteToSave, id: this.nextId }];
       this.nextId += 1;
     }
 
@@ -141,8 +163,13 @@ export class App implements OnInit {
   }
 
   edit(arte: Arte) {
-    this.arte = { ...arte };
-    this.selectedTipo = this.tipos.find((t) => t.name === arte.tipo);
+    this.FormModel.set({
+      id: arte.id,
+      name: arte.name,
+      tipo: this.tipos.find((t) => t.name === arte.tipo) ?? null,
+      description: arte.description,
+      foto: arte.foto
+    });
   }
 
   delete(id?: number) {
@@ -153,8 +180,13 @@ export class App implements OnInit {
   }
 
   resetForm() {
-    this.arte = { name: '', tipo: '', description: '', foto: '' };
-    this.selectedTipo = undefined;
+    this.FormModel.set({
+      id: undefined,
+      name: '',
+      tipo: null,
+      description: '',
+      foto: ''
+    });
   }
 
   private persistArtes() {
