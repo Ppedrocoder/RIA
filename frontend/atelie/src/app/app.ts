@@ -1,4 +1,4 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, computed, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { InputTextModule } from 'primeng/inputtext';
@@ -7,6 +7,8 @@ import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
 import { SelectModule } from 'primeng/select';
 import { DividerModule } from 'primeng/divider';
+
+
 interface Tipo {
   name: string;
 }
@@ -36,32 +38,52 @@ interface Forms {
   <div class='justify-content-center text-center'>
 
   <div class="card flex justify-center m-4">
-            <p-iftalabel>
+          <div class="grid grid-cols-1 md:grid-cols-1 gap-1">
+            <p-iftalabel [class.p-invalid]="nameError()">
                 <input pInputText id="username" [ngModel]="FormModel().name" (ngModelChange)="updateForm('name', $event)" autocomplete="off" />
                 <label for="username">Nome</label>
             </p-iftalabel>
-  </div>
-  <div class="card flex justify-center">
-              <p-select [options]="tipos" [ngModel]="FormModel().tipo" (ngModelChange)="updateForm('tipo', $event)" [checkmark]="true" optionLabel="name" [showClear]="true" placeholder="Select a Tipo" class="w-full md:w-56" />
+            @if (nameError()) {
+              <span class="text-red-500 text-sm">{{ nameError() }}</span>
+            }
+          </div>
   </div>
   <div class="card flex justify-center m-4">
-            <p-iftalabel>
+            <div class="grid grid-cols-1 md:grid-cols-1 gap-1">
+              <p-select [options]="tipos" [ngModel]="FormModel().tipo" (ngModelChange)="updateForm('tipo', $event)" [checkmark]="true" optionLabel="name" [showClear]="true" placeholder="Select a Tipo" class="w-full md:w-56" [class.p-invalid]="tipoError()" />
+              @if (tipoError()) {
+                <span class="text-red-500 text-sm">{{ tipoError() }}</span>
+              }
+            </div>
+  </div>
+  <div class="card flex justify-center m-4">
+          <div class="grid grid-cols-1 md:grid-cols-1 gap-1">
+            <p-iftalabel [class.p-invalid]="descriptionError()">
                 <input pInputText id="description" [ngModel]="FormModel().description" (ngModelChange)="updateForm('description', $event)" autocomplete="off" />
                 <label for="description">Descrição</label>
             </p-iftalabel>
+            @if (descriptionError()) {
+              <span class="text-red-500 text-sm">{{ descriptionError() }}</span>
+            }
+          </div>
   </div>
   <div class="card flex justify-center m-4">
-            <p-iftalabel>
+        <div class="grid grid-cols-1 md:grid-cols-1 gap-1">
+            <p-iftalabel [class.p-invalid]="fotoError()">
                 <input pInputText id="foto" [ngModel]="FormModel().foto" (ngModelChange)="updateForm('foto', $event)" autocomplete="off" />
                 <label for="foto">Foto</label>
             </p-iftalabel>
+            @if (fotoError()) {
+              <span class="text-red-500 text-sm">{{ fotoError() }}</span>
+            }
+        </div>
   </div>
   <div class="card flex justify-center m-4">
-              <p-button label="{{ FormModel().id ? 'Atualizar' : 'Salvar' }}" (click)="save()" />
+              <p-button [disabled]="!this.isValid()" label="{{ FormModel().id ? 'Atualizar' : 'Salvar' }}" (click)="save()" />
   </div>
 
           <div *ngIf="FormModel().id" class="card flex justify-center m-4">
-            <p-button severity="secondary" label="Cancelar" (click)="resetForm()" />
+            <p-button [disabled]="!this.isValid()" severity="secondary" label="Cancelar" (click)="resetForm()" />
   </div>
   <ul>
     <li *ngFor="let a of artes">
@@ -108,6 +130,38 @@ export class App implements OnInit {
   artes: Arte[] = [];
 
   private nextId = 1;
+  
+  isValid = computed(() => {
+    return !this.nameError() && !this.tipoError() && !this.descriptionError() && !this.fotoError();
+  });
+
+  nameError = computed(() => {
+    if (!this.FormModel().name.trim()) {
+      return 'O nome é obrigatório.';
+    }
+    return ''
+  });
+
+  tipoError = computed(() => {
+    if (!this.FormModel().tipo) {
+      return 'O tipo é obrigatório.';
+    }
+    return ''
+  });
+
+  descriptionError = computed(() => {
+    if (!this.FormModel().description.trim()) {
+      return 'A descrição é obrigatória.';
+    }
+    return ''
+  });
+
+  fotoError = computed(() => {
+    if (!this.FormModel().foto.trim()) {
+      return 'A foto é obrigatória.';
+    }
+    return ''
+  });
 
   ngOnInit(): void {
     this.loadArtes();
