@@ -79,11 +79,11 @@ interface Forms {
         </div>
   </div>
   <div class="card flex justify-center m-4">
-              <p-button label="{{ FormModel().id ? 'Atualizar' : 'Salvar' }}" (click)="save()" />
+              <p-button [disabled]="!this.isValid()" label="{{ FormModel().id ? 'Atualizar' : 'Salvar' }}" (click)="save()" />
   </div>
 
           <div *ngIf="FormModel().id" class="card flex justify-center m-4">
-            <p-button severity="secondary" label="Cancelar" (click)="resetForm()" />
+            <p-button [disabled]="!this.isValid()" severity="secondary" label="Cancelar" (click)="resetForm()" />
   </div>
   <ul>
     <li *ngFor="let a of artes">
@@ -130,6 +130,10 @@ export class App implements OnInit {
   artes: Arte[] = [];
 
   private nextId = 1;
+  
+  isValid = computed(() => {
+    return !this.nameError() && !this.tipoError() && !this.descriptionError() && !this.fotoError();
+  });
 
   nameError = computed(() => {
     if (!this.FormModel().name.trim()) {
