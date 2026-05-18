@@ -7,6 +7,7 @@ import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
 import { SelectModule } from 'primeng/select';
 import { DividerModule } from 'primeng/divider';
+import { form, FormField, required } from '@angular/forms/signals';
 
 
 interface Tipo {
@@ -30,7 +31,7 @@ interface Forms {
 
 @Component({
   selector: 'app-root',
-  imports: [CommonModule, FormsModule, InputTextModule, IftaLabelModule, ButtonModule, CardModule, SelectModule, DividerModule],
+  imports: [CommonModule, FormsModule, InputTextModule, IftaLabelModule, ButtonModule, CardModule, SelectModule, DividerModule, FormField],
   template: ` 
   <p-divider align="center" class="mb-4">
     <h2 class="text-4xl font-bold m-4">Ateliê Potiguar</h2>
@@ -40,7 +41,7 @@ interface Forms {
   <div class="card flex justify-center m-4">
           <div class="grid grid-cols-1 md:grid-cols-1 gap-1">
             <p-iftalabel [class.p-invalid]="nameError()">
-                <input pInputText id="username" [ngModel]="FormModel().name" (ngModelChange)="updateForm('name', $event)" autocomplete="off" />
+                <input pInputText id="username" [formField]="formAtelie.name" autocomplete="off" />
                 <label for="username">Nome</label>
             </p-iftalabel>
             @if (nameError()) {
@@ -50,7 +51,7 @@ interface Forms {
   </div>
   <div class="card flex justify-center m-4">
             <div class="grid grid-cols-1 md:grid-cols-1 gap-1">
-              <p-select [options]="tipos" [ngModel]="FormModel().tipo" (ngModelChange)="updateForm('tipo', $event)" [checkmark]="true" optionLabel="name" [showClear]="true" placeholder="Select a Tipo" class="w-full md:w-56" [class.p-invalid]="tipoError()" />
+              <p-select [options]="tipos" [formField]="$any(formAtelie.tipo)" [checkmark]="true" optionLabel="name" [showClear]="true" placeholder="Selecione um Tipo" class="w-full md:w-56" [class.p-invalid]="tipoError()" />
               @if (tipoError()) {
                 <span class="text-red-500 text-sm">{{ tipoError() }}</span>
               }
@@ -59,7 +60,7 @@ interface Forms {
   <div class="card flex justify-center m-4">
           <div class="grid grid-cols-1 md:grid-cols-1 gap-1">
             <p-iftalabel [class.p-invalid]="descriptionError()">
-                <input pInputText id="description" [ngModel]="FormModel().description" (ngModelChange)="updateForm('description', $event)" autocomplete="off" />
+                <input pInputText id="description" [formField]="formAtelie.description" autocomplete="off" />
                 <label for="description">Descrição</label>
             </p-iftalabel>
             @if (descriptionError()) {
@@ -70,7 +71,7 @@ interface Forms {
   <div class="card flex justify-center m-4">
         <div class="grid grid-cols-1 md:grid-cols-1 gap-1">
             <p-iftalabel [class.p-invalid]="fotoError()">
-                <input pInputText id="foto" [ngModel]="FormModel().foto" (ngModelChange)="updateForm('foto', $event)" autocomplete="off" />
+                <input pInputText id="foto" [formField]="formAtelie.foto" autocomplete="off" />
                 <label for="foto">Foto</label>
             </p-iftalabel>
             @if (fotoError()) {
@@ -79,11 +80,11 @@ interface Forms {
         </div>
   </div>
   <div class="card flex justify-center m-4">
-              <p-button [disabled]="!this.isValid()" label="{{ FormModel().id ? 'Atualizar' : 'Salvar' }}" (click)="save()" />
+              <p-button [disabled]="formAtelie().invalid()" label="{{ formModel().id ? 'Atualizar' : 'Salvar' }}" (click)="save()" />
   </div>
 
-          <div *ngIf="FormModel().id" class="card flex justify-center m-4">
-            <p-button [disabled]="!this.isValid()" severity="secondary" label="Cancelar" (click)="resetForm()" />
+          <div *ngIf="formModel().id" class="card flex justify-center m-4">
+            <p-button [disabled]="formAtelie().invalid()" severity="secondary" label="Cancelar" (click)="resetForm()" />
   </div>
   <ul>
     <li *ngFor="let a of artes">
@@ -117,8 +118,7 @@ interface Forms {
 export class App implements OnInit {
   protected readonly title = signal('atelie');
   private readonly storageKey = 'atelie-artes';
-
-  FormModel = signal<Forms>({ 
+  formModel = signal<Forms>({ 
     id: undefined,
     name: '', 
     tipo: null, 
@@ -126,53 +126,52 @@ export class App implements OnInit {
     foto: '' 
   });
 
+  formAtelie = form(this.formModel, (schemaPath) => {
+    required(schemaPath.name, {message: 'O nome é obrigatório.'});
+    required(schemaPath.tipo, {message: 'O tipo é obrigatório.'});
+    required(schemaPath.description, {message: 'A descrição é obrigatória.'});
+    required(schemaPath.foto, {message: 'A foto é obrigatória.'});
+  });
   tipos: Tipo[] = [];
   artes: Arte[] = [];
 
   private nextId = 1;
   
-  isValid = computed(() => {
-    return !this.nameError() && !this.tipoError() && !this.descriptionError() && !this.fotoError();
-  });
-
   nameError = computed(() => {
-    if (!this.FormModel().name.trim()) {
+    if (!this.formModel().name.trim()) {
       return 'O nome é obrigatório.';
     }
-    return ''
+    return '';
   });
 
   tipoError = computed(() => {
-    if (!this.FormModel().tipo) {
+    if (!this.formModel().tipo) {
       return 'O tipo é obrigatório.';
     }
-    return ''
+    return '';
   });
 
   descriptionError = computed(() => {
-    if (!this.FormModel().description.trim()) {
+    if (!this.formModel().description.trim()) {
       return 'A descrição é obrigatória.';
     }
-    return ''
+    return '';
   });
 
   fotoError = computed(() => {
-    if (!this.FormModel().foto.trim()) {
+    if (!this.formModel().foto.trim()) {
       return 'A foto é obrigatória.';
     }
-    return ''
+    return '';
+  });
+
+  isValid = computed(() => {
+    return !this.nameError() && !this.tipoError() && !this.descriptionError() && !this.fotoError();
   });
 
   ngOnInit(): void {
     this.loadArtes();
     this.tipos = [ { name: 'Pintura' }, { name: 'Escultura' }, { name: 'Fotografia' }, { name: 'Desenho' }, { name: 'Cerâmica' } ];
-  }
-
-  updateForm<K extends keyof Forms>(field: K, value: Forms[K]) {
-    this.FormModel.update((form) => ({
-      ...form,
-      [field]: value
-    }));
   }
 
   loadArtes() {
@@ -194,7 +193,7 @@ export class App implements OnInit {
   }
 
   save() {
-    const form = this.FormModel();
+    const form = this.formModel();
     const arteToSave: Arte = {
       id: form.id,
       name: form.name,
@@ -217,7 +216,7 @@ export class App implements OnInit {
   }
 
   edit(arte: Arte) {
-    this.FormModel.set({
+    this.formModel.set({
       id: arte.id,
       name: arte.name,
       tipo: this.tipos.find((t) => t.name === arte.tipo) ?? null,
@@ -234,7 +233,7 @@ export class App implements OnInit {
   }
 
   resetForm() {
-    this.FormModel.set({
+    this.formModel.set({
       id: undefined,
       name: '',
       tipo: null,
