@@ -105,7 +105,8 @@ interface Forms {
           }
           
   <ul>
-    <li *ngFor="let a of artes">
+    @for (a of artes; track a.id) {
+      <li>
       <div class="mb-4 p-8 flex items-center justify-center">
             <p-card [style]="{ width: '25rem', overflow: 'hidden' }">
                 <ng-template #header>
@@ -126,6 +127,8 @@ interface Forms {
       </div>
       
     </li>
+    }
+    
   </ul>
   <p-divider align="center" class="mt-4">
     <h2 class="text-2xl font-bold m-4">Feito por: Pedro Ricardo</h2>
