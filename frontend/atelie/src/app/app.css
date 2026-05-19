@@ -1,0 +1,7 @@
+/* Component styles for App */
+
+:host {
+  display: block;
+}
+
+/* Add component-specific rules here */
