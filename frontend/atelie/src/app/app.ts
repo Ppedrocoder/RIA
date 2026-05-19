@@ -96,12 +96,14 @@ interface Forms {
         </div>
   </div>
   <div class="card flex justify-center m-4">
-              <p-button [disabled]="formAtelie().invalid()" label="{{ formModel().id ? 'Atualizar' : 'Salvar' }}" (click)="save()" />
+              <p-button [disabled]="formAtelie().invalid()" label="{{ formAtelie.id ? 'Atualizar' : 'Salvar' }}" (click)="save()" />
   </div>
-
-          <div *ngIf="formModel().id" class="card flex justify-center m-4">
+          @if (formAtelie.id) {
+            <div class="card flex justify-center m-4">
             <p-button [disabled]="formAtelie().invalid()" severity="secondary" label="Cancelar" (click)="resetForm()" />
-  </div>
+            </div>
+          }
+          
   <ul>
     <li *ngFor="let a of artes">
       <div class="mb-4 p-8 flex items-center justify-center">
