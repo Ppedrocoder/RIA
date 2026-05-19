@@ -40,42 +40,58 @@ interface Forms {
 
   <div class="card flex justify-center m-4">
           <div class="grid grid-cols-1 md:grid-cols-1 gap-1">
-            <p-iftalabel [class.p-invalid]="nameError()">
+            <p-iftalabel>
                 <input pInputText id="username" [formField]="formAtelie.name" autocomplete="off" />
                 <label for="username">Nome</label>
             </p-iftalabel>
-            @if (nameError()) {
-              <span class="text-red-500 text-sm">{{ nameError() }}</span>
+            @if (formAtelie.name().invalid()) {
+              <ul>
+                  @for (error of formAtelie.name().errors(); track error) {
+                    <li class="text-red-500">{{ error.message }}</li>
+                  }
+              </ul>
             }
           </div>
   </div>
   <div class="card flex justify-center m-4">
             <div class="grid grid-cols-1 md:grid-cols-1 gap-1">
-              <p-select [options]="tipos" [formField]="$any(formAtelie.tipo)" [checkmark]="true" optionLabel="name" [showClear]="true" placeholder="Selecione um Tipo" class="w-full md:w-56" [class.p-invalid]="tipoError()" />
-              @if (tipoError()) {
-                <span class="text-red-500 text-sm">{{ tipoError() }}</span>
+              <p-select [options]="tipos" [formField]="$any(formAtelie.tipo)" [checkmark]="true" optionLabel="name" [showClear]="true" placeholder="Selecione um Tipo" class="w-full md:w-56" />
+              @if (formAtelie.tipo().invalid()) {
+                <ul>
+                    @for (error of formAtelie.tipo().errors(); track error) {
+                      <li class="text-red-500">{{ error.message }}</li>
+                    }
+                </ul>
               }
             </div>
   </div>
   <div class="card flex justify-center m-4">
           <div class="grid grid-cols-1 md:grid-cols-1 gap-1">
-            <p-iftalabel [class.p-invalid]="descriptionError()">
+            <p-iftalabel >
                 <input pInputText id="description" [formField]="formAtelie.description" autocomplete="off" />
                 <label for="description">Descrição</label>
             </p-iftalabel>
-            @if (descriptionError()) {
-              <span class="text-red-500 text-sm">{{ descriptionError() }}</span>
+            @if (formAtelie.description().invalid()) {
+              <ul>
+                  @for (error of formAtelie.description().errors(); track error) {
+                    <li class="text-red-500">{{ error.message }}</li>
+                  }
+              </ul>
             }
           </div>
   </div>
   <div class="card flex justify-center m-4">
         <div class="grid grid-cols-1 md:grid-cols-1 gap-1">
-            <p-iftalabel [class.p-invalid]="fotoError()">
+            <p-iftalabel>
                 <input pInputText id="foto" [formField]="formAtelie.foto" autocomplete="off" />
                 <label for="foto">Foto</label>
             </p-iftalabel>
-            @if (fotoError()) {
-              <span class="text-red-500 text-sm">{{ fotoError() }}</span>
+            @if (formAtelie.foto().invalid()) {
+              <ul>
+                  @for (error of formAtelie.foto().errors(); track error) {
+                    <li class="text-red-500">{{ error.message }}</li>
+                  }
+              </ul>
             }
         </div>
   </div>
@@ -136,38 +152,6 @@ export class App implements OnInit {
   artes: Arte[] = [];
 
   private nextId = 1;
-  
-  nameError = computed(() => {
-    if (!this.formModel().name.trim()) {
-      return 'O nome é obrigatório.';
-    }
-    return '';
-  });
-
-  tipoError = computed(() => {
-    if (!this.formModel().tipo) {
-      return 'O tipo é obrigatório.';
-    }
-    return '';
-  });
-
-  descriptionError = computed(() => {
-    if (!this.formModel().description.trim()) {
-      return 'A descrição é obrigatória.';
-    }
-    return '';
-  });
-
-  fotoError = computed(() => {
-    if (!this.formModel().foto.trim()) {
-      return 'A foto é obrigatória.';
-    }
-    return '';
-  });
-
-  isValid = computed(() => {
-    return !this.nameError() && !this.tipoError() && !this.descriptionError() && !this.fotoError();
-  });
 
   ngOnInit(): void {
     this.loadArtes();
