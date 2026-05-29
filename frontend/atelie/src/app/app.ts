@@ -8,6 +8,8 @@ import { CardModule } from 'primeng/card';
 import { SelectModule } from 'primeng/select';
 import { DividerModule } from 'primeng/divider';
 import { form, FormField, required } from '@angular/forms/signals';
+import { List } from './list/list';
+import { Form } from './form/form';
 
 
 interface Tipo {
@@ -31,105 +33,13 @@ interface Forms {
 
 @Component({
   selector: 'app-root',
-  imports: [CommonModule, FormsModule, InputTextModule, IftaLabelModule, ButtonModule, CardModule, SelectModule, DividerModule, FormField],
+  imports: [CommonModule, FormsModule, InputTextModule, IftaLabelModule, ButtonModule, CardModule, SelectModule, DividerModule, FormField, Form, List],
   template: ` 
   <p-divider align="center" class="mb-4">
     <h2 class="text-4xl font-bold m-4">Ateliê Potiguar</h2>
   </p-divider>
-  <div class='justify-content-center text-center'>
-
-  <div class="card flex justify-center m-4">
-          <div class="grid grid-cols-1 md:grid-cols-1 gap-1">
-            <p-iftalabel>
-                <input pInputText id="username" [formField]="formAtelie.name" autocomplete="off" />
-                <label for="username">Nome</label>
-            </p-iftalabel>
-            @if (formAtelie.name().invalid()) {
-              <ul>
-                  @for (error of formAtelie.name().errors(); track error) {
-                    <li class="text-red-500">{{ error.message }}</li>
-                  }
-              </ul>
-            }
-          </div>
-  </div>
-  <div class="card flex justify-center m-4">
-            <div class="grid grid-cols-1 md:grid-cols-1 gap-1">
-              <p-select [options]="tipos" [formField]="$any(formAtelie.tipo)" [checkmark]="true" optionLabel="name" [showClear]="true" placeholder="Selecione um Tipo" class="w-full md:w-56" />
-              @if (formAtelie.tipo().invalid()) {
-                <ul>
-                    @for (error of formAtelie.tipo().errors(); track error) {
-                      <li class="text-red-500">{{ error.message }}</li>
-                    }
-                </ul>
-              }
-            </div>
-  </div>
-  <div class="card flex justify-center m-4">
-          <div class="grid grid-cols-1 md:grid-cols-1 gap-1">
-            <p-iftalabel >
-                <input pInputText id="description" [formField]="formAtelie.description" autocomplete="off" />
-                <label for="description">Descrição</label>
-            </p-iftalabel>
-            @if (formAtelie.description().invalid()) {
-              <ul>
-                  @for (error of formAtelie.description().errors(); track error) {
-                    <li class="text-red-500">{{ error.message }}</li>
-                  }
-              </ul>
-            }
-          </div>
-  </div>
-  <div class="card flex justify-center m-4">
-        <div class="grid grid-cols-1 md:grid-cols-1 gap-1">
-            <p-iftalabel>
-                <input pInputText id="foto" [formField]="formAtelie.foto" autocomplete="off" />
-                <label for="foto">Foto</label>
-            </p-iftalabel>
-            @if (formAtelie.foto().invalid()) {
-              <ul>
-                  @for (error of formAtelie.foto().errors(); track error) {
-                    <li class="text-red-500">{{ error.message }}</li>
-                  }
-              </ul>
-            }
-        </div>
-  </div>
-  <div class="card flex justify-center m-4">
-              <p-button [disabled]="formAtelie().invalid()" label="{{ formAtelie.id ? 'Atualizar' : 'Salvar' }}" (click)="save()" />
-  </div>
-          @if (formAtelie.id) {
-            <div class="card flex justify-center m-4">
-            <p-button [disabled]="formAtelie().invalid()" severity="secondary" label="Cancelar" (click)="resetForm()" />
-            </div>
-          }
-          
-  <ul>
-    @for (a of artes; track a.id) {
-      <li>
-      <div class="mb-4 p-8 flex items-center justify-center">
-            <p-card [style]="{ width: '25rem', overflow: 'hidden' }">
-                <ng-template #header>
-                    <img alt="Card" class="w-full" [src]="a.foto" [alt]="a.name" />
-                </ng-template>
-                <ng-template #title> {{ a.name }} </ng-template>
-                <ng-template #subtitle> {{ a.tipo }} </ng-template>
-                <p>
-                    {{ a.description }}
-                </p>
-                <ng-template #footer>
-                    <div class="flex gap-4 mt-1">
-                        <p-button label="Editar" [outlined]="true" class="w-full" styleClass="w-full" (click)="edit(a)" />
-                        <p-button label="Excluir" severity="secondary" [outlined]="true" class="w-full" styleClass="w-full" (click)="delete(a.id)" />
-                    </div>
-                </ng-template>
-            </p-card>
-      </div>
-      
-    </li>
-    }
-    
-  </ul>
+  <app-form [formAtelie]="formAtelie" [tipos]="tipos" (save)="save()" (resetForm)="resetForm()"></app-form>
+  <app-list [artes]="artes" (edit)="edit($event)" (delete)="delete($event)"></app-list>
   <p-divider align="center" class="mt-4">
     <h2 class="text-2xl font-bold m-4">Feito por: Pedro Ricardo</h2>
   </p-divider>

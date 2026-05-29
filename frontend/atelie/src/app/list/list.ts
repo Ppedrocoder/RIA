@@ -1,11 +1,13 @@
-import { Component } from '@angular/core';
+import { Component, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { CardModule } from 'primeng/card';
 import { ButtonModule } from 'primeng/button';
+import { ListActions } from '../list-actions/list-actions';
+import { Input, Output } from '@angular/core';
 
 @Component({
   selector: 'app-list',
-  imports: [CommonModule, CardModule, ButtonModule],
+  imports: [CommonModule, CardModule, ButtonModule, ListActions],
   template: `
      <ul>
     @for (a of artes; track a.id) {
@@ -21,10 +23,7 @@ import { ButtonModule } from 'primeng/button';
                     {{ a.description }}
                 </p>
                 <ng-template #footer>
-                    <div class="flex gap-4 mt-1">
-                        <p-button label="Editar" [outlined]="true" class="w-full" styleClass="w-full" (click)="edit(a)" />
-                        <p-button label="Excluir" severity="secondary" [outlined]="true" class="w-full" styleClass="w-full" (click)="delete(a.id)" />
-                    </div>
+                    <app-list-actions [a]="a" (edit)="onEdit($event)" (delete)="onDelete($event)"></app-list-actions>
                 </ng-template>
             </p-card>
       </div>
@@ -36,4 +35,16 @@ import { ButtonModule } from 'primeng/button';
   `,
   styleUrl: './list.css',
 })
-export class List {}
+export class List {
+  @Input() artes: any[] = [];
+  @Output() edit = new EventEmitter<any>();
+  @Output() delete = new EventEmitter<number>();
+
+  onEdit(art: any) {
+    this.edit.emit(art);
+  }
+
+  onDelete(id: number) {
+    this.delete.emit(id);
+  }
+}

@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { InputTextModule } from 'primeng/inputtext';
@@ -8,10 +8,12 @@ import { CardModule } from 'primeng/card';
 import { SelectModule } from 'primeng/select';
 import { DividerModule } from 'primeng/divider';
 import { form, FormField, required } from '@angular/forms/signals';
+import { FormActions } from '../form-actions/form-actions';
+import { Input, Output } from '@angular/core';
 
 @Component({
   selector: 'app-form',
-  imports: [ CommonModule, FormsModule, InputTextModule, IftaLabelModule, ButtonModule, CardModule, SelectModule, DividerModule, FormField],
+  imports: [ CommonModule, FormsModule, InputTextModule, IftaLabelModule, ButtonModule, CardModule, SelectModule, DividerModule, FormField, FormActions],
   template: `
    <div class='justify-content-center text-center'>
 
@@ -72,7 +74,22 @@ import { form, FormField, required } from '@angular/forms/signals';
             }
         </div>
   </div>
+  <app-form-actions [formAtelie]="formAtelie" (save)="onSave()" (resetForm)="onResetForm()"></app-form-actions>
+
   `,
   styleUrl: './form.css',
 })
-export class Form {}
+export class Form {
+  @Input() formAtelie: any;
+  @Input() tipos: any[] = [];
+  @Output() save = new EventEmitter<void>();
+  @Output() resetForm = new EventEmitter<void>();
+
+  onSave() {
+    this.save.emit();
+  }
+
+  onResetForm() {
+    this.resetForm.emit();
+  }
+}
