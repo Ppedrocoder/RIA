@@ -1,31 +1,22 @@
 import { Injectable, signal } from '@angular/core';
-import { Tipo, Arte } from '../app';
+import { Arte } from '../app';
+import { TipoArteService } from './tipo-arte-service';
 
 
 @Injectable({
   providedIn: 'root',
 })
-export class Service {
-    private readonly storageKey = 'atelie-artes';
-    tipos = signal<Tipo[]>([]);
-    artes = signal<Arte[]>([]);
-    
+export class arteService {
+  private readonly storageKey = 'atelie-artes';
+  artes = signal<Arte[]>([]);
+  tipoArteService = new TipoArteService();
+  tipos = this.tipoArteService.getTipos();
   
   private nextId = 1;
   
   getArtes() {
     return this.artes();
   }
-
-  getTipos() {
-    return this.tipos();
-  }
-
-  setTipos(tipos: Tipo[]) {
-    this.tipos.set(tipos);
-  }
-
-  
 
   loadArtes() {
     const storedArtes = localStorage.getItem(this.storageKey);
@@ -50,7 +41,7 @@ export class Service {
     const arteToSave: Arte = {
       id: form.id,
       name: form.name,
-      tipo: form.tipo?.name ?? '',
+      tipoarte: form.tipoarte?.name ?? '',
       description: form.description,
       foto: form.foto
     };
@@ -71,7 +62,7 @@ export class Service {
     formModel.set({
       id: arte.id,
       name: arte.name,
-      tipo: this.tipos().find((t) => t.name === arte.tipo) ?? null,
+      tipoarte: this.tipos.find((t) => t.name === arte.tipoarte) ?? null,
       description: arte.description,
       foto: arte.foto
     });
@@ -88,7 +79,7 @@ export class Service {
     formModel.set({
       id: undefined,
       name: '',
-      tipo: null,
+      tipoarte: null,
       description: '',
       foto: ''
     });
