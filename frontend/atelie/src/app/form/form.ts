@@ -1,4 +1,4 @@
-import { Component, EventEmitter } from '@angular/core';
+import { Component, input, output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { InputTextModule } from 'primeng/inputtext';
@@ -7,9 +7,9 @@ import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
 import { SelectModule } from 'primeng/select';
 import { DividerModule } from 'primeng/divider';
-import { form, FormField, required } from '@angular/forms/signals';
+import { FormField } from '@angular/forms/signals';
 import { FormActions } from '../form-actions/form-actions';
-import { Input, Output } from '@angular/core';
+import { Input } from '@angular/core';
 
 @Component({
   selector: 'app-form',
@@ -34,7 +34,7 @@ import { Input, Output } from '@angular/core';
   </div>
   <div class="card flex justify-center m-4">
             <div class="grid grid-cols-1 md:grid-cols-1 gap-1">
-              <p-select [options]="tipos" [formField]="$any(formAtelie.tipo)" [checkmark]="true" optionLabel="name" [showClear]="true" placeholder="Selecione um Tipo" class="w-full md:w-56" />
+              <p-select [options]="tipos()" [formField]="$any(formAtelie.tipo)" [checkmark]="true" optionLabel="name" [showClear]="true" placeholder="Selecione um Tipo" class="w-full md:w-56" />
               @if (formAtelie.tipo().invalid()) {
                 <ul>
                     @for (error of formAtelie.tipo().errors(); track error) {
@@ -81,9 +81,9 @@ import { Input, Output } from '@angular/core';
 })
 export class Form {
   @Input() formAtelie: any;
-  @Input() tipos: any[] = [];
-  @Output() save = new EventEmitter<void>();
-  @Output() resetForm = new EventEmitter<void>();
+  tipos = input<any[]>();
+  save = output<void>();
+  resetForm = output<void>();
 
   onSave() {
     this.save.emit();

@@ -1,16 +1,16 @@
-import { Component, EventEmitter } from '@angular/core';
+import { Component, input, output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { CardModule } from 'primeng/card';
 import { ButtonModule } from 'primeng/button';
 import { ListActions } from '../list-actions/list-actions';
-import { Input, Output } from '@angular/core';
+import { Arte } from '../app';
 
 @Component({
   selector: 'app-list',
   imports: [CommonModule, CardModule, ButtonModule, ListActions],
   template: `
      <ul>
-    @for (a of artes; track a.id) {
+    @for (a of artes(); track a.id) {
       <li>
       <div class="mb-4 p-8 flex items-center justify-center">
             <p-card [style]="{ width: '25rem', overflow: 'hidden' }">
@@ -36,11 +36,11 @@ import { Input, Output } from '@angular/core';
   styleUrl: './list.css',
 })
 export class List {
-  @Input() artes: any[] = [];
-  @Output() edit = new EventEmitter<any>();
-  @Output() delete = new EventEmitter<number>();
+  artes = input<Arte[]>();
+  edit = output<Arte>();
+  delete = output<number>();
 
-  onEdit(art: any) {
+  onEdit(art: Arte) {
     this.edit.emit(art);
   }
 

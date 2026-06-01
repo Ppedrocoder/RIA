@@ -1,6 +1,5 @@
-import { Injectable, Input, signal } from '@angular/core';
-import { form, required } from '@angular/forms/signals';
-import { Tipo, Arte, Forms } from '../app';
+import { Injectable, signal } from '@angular/core';
+import { Tipo, Arte } from '../app';
 
 
 @Injectable({
@@ -10,20 +9,7 @@ export class Service {
     private readonly storageKey = 'atelie-artes';
     tipos = signal<Tipo[]>([]);
     artes = signal<Arte[]>([]);
-    formModel = signal<Forms>({ 
-      id: undefined,
-      name: '', 
-      tipo: null, 
-      description: '',
-      foto: '' 
-    });
-  
-    formAtelie = form(this.formModel, (schemaPath) => {
-      required(schemaPath.name, {message: 'O nome é obrigatório.'});
-      required(schemaPath.tipo, {message: 'O tipo é obrigatório.'});
-      required(schemaPath.description, {message: 'A descrição é obrigatória.'});
-      required(schemaPath.foto, {message: 'A foto é obrigatória.'});
-    });
+    
   
   private nextId = 1;
   
@@ -39,9 +25,7 @@ export class Service {
     this.tipos.set(tipos);
   }
 
-  getFormModel() {
-    return this.formAtelie;
-  }
+  
 
   loadArtes() {
     const storedArtes = localStorage.getItem(this.storageKey);
@@ -61,8 +45,8 @@ export class Service {
       this.nextId = 1;
     }
   }
-  save() {
-    const form = this.formModel();
+  save(formModel: any) {
+    const form = formModel();
     const arteToSave: Arte = {
       id: form.id,
       name: form.name,
@@ -80,11 +64,11 @@ export class Service {
     }
 
     this.persistArtes();
-    this.resetForm();
+    this.resetForm(formModel);
   }
 
-  edit(arte: Arte) {
-    this.formModel.set({
+  edit(arte: Arte, formModel: any) {
+    formModel.set({
       id: arte.id,
       name: arte.name,
       tipo: this.tipos().find((t) => t.name === arte.tipo) ?? null,
@@ -100,8 +84,8 @@ export class Service {
     this.persistArtes();
   }
 
-  resetForm() {
-    this.formModel.set({
+  resetForm(formModel: any) {
+    formModel.set({
       id: undefined,
       name: '',
       tipo: null,

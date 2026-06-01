@@ -1,6 +1,7 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ButtonModule } from 'primeng/button';
+import { output } from '@angular/core';
 
 @Component({
   selector: 'app-form-actions',
@@ -20,8 +21,8 @@ template:`
 })
 export class FormActions {
   @Input() formAtelie: any;
-  @Output() save = new EventEmitter<void>();
-  @Output() resetForm = new EventEmitter<void>();
+  save = output<void>();
+  resetForm = output<void>();
 
   onSave() {
     this.save.emit();
