@@ -1,6 +1,5 @@
 import { Injectable, signal } from '@angular/core';
-import { Arte } from '../app';
-import { TipoArteService } from './tipo-arte-service';
+import { Arte, TipoArte } from '../app';
 
 
 @Injectable({
@@ -9,8 +8,6 @@ import { TipoArteService } from './tipo-arte-service';
 export class arteService {
   private readonly storageKey = 'atelie-artes';
   artes = signal<Arte[]>([]);
-  tipoArteService = new TipoArteService();
-  tipos = this.tipoArteService.getTipos();
   
   private nextId = 1;
   
@@ -58,11 +55,11 @@ export class arteService {
     this.resetForm(formModel);
   }
 
-  edit(arte: Arte, formModel: any) {
+  edit(arte: Arte, formModel: any, tipos: TipoArte[]) {
     formModel.set({
       id: arte.id,
       name: arte.name,
-      tipoarte: this.tipos.find((t) => t.name === arte.tipoarte) ?? null,
+      tipoarte: tipos.find((t) => t.name === arte.tipoarte) ?? null,
       description: arte.description,
       foto: arte.foto
     });

@@ -18,7 +18,7 @@ import { Arte } from '../app';
                     <img alt="Card" class="w-full" [src]="a.foto" [alt]="a.name" />
                 </ng-template>
                 <ng-template #title> {{ a.name }} </ng-template>
-                <ng-template #subtitle> {{ a.tipo }} </ng-template>
+                <ng-template #subtitle> {{ a.tipoarte }} </ng-template>
                 <p>
                     {{ a.description }}
                 </p>

@@ -34,10 +34,10 @@ import { Input } from '@angular/core';
   </div>
   <div class="card flex justify-center m-4">
             <div class="grid grid-cols-1 md:grid-cols-1 gap-1">
-              <p-select [options]="tipos()" [formField]="$any(formAtelie.tipo)" [checkmark]="true" optionLabel="name" [showClear]="true" placeholder="Selecione um Tipo" class="w-full md:w-56" />
-              @if (formAtelie.tipo().invalid()) {
+              <p-select [options]="tipos()" [formField]="$any(formAtelie.tipoarte)" [checkmark]="true" optionLabel="name" [showClear]="true" placeholder="Selecione um Tipo" class="w-full md:w-56" />
+              @if (formAtelie.tipoarte().invalid()) {
                 <ul>
-                    @for (error of formAtelie.tipo().errors(); track error) {
+                    @for (error of formAtelie.tipoarte().errors(); track error) {
                       <li class="text-red-500">{{ error.message }}</li>
                     }
                 </ul>
