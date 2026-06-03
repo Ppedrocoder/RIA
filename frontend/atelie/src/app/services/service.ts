@@ -1,11 +1,11 @@
 import { Injectable, signal } from '@angular/core';
-import { Arte, TipoArte } from '../app';
+import { Arte } from '../app';
 
 
 @Injectable({
   providedIn: 'root',
 })
-export class arteService {
+export class ArteService {
   private readonly storageKey = 'atelie-artes';
   artes = signal<Arte[]>([]);
   
@@ -33,36 +33,16 @@ export class arteService {
       this.nextId = 1;
     }
   }
-  save(formModel: any) {
-    const form = formModel();
-    const arteToSave: Arte = {
-      id: form.id,
-      name: form.name,
-      tipoarte: form.tipoarte?.name ?? '',
-      description: form.description,
-      foto: form.foto
-    };
-
+  save(arteToSave: Arte) {
     const current = this.artes();
-    if (arteToSave.id) {
-      this.artes.set(current.map((arte) => (arte.id === arteToSave.id ? { ...arteToSave } : arte)));
+    if (arteToSave.id !== undefined) {
+      this.artes.set(current.map((arte) => (arte.id === arteToSave.id ? { ...arte, ...arteToSave } : arte)));
     } else {
       this.artes.set([...current, { ...arteToSave, id: this.nextId }]);
       this.nextId += 1;
     }
 
     this.persistArtes();
-    this.resetForm(formModel);
-  }
-
-  edit(arte: Arte, formModel: any, tipos: TipoArte[]) {
-    formModel.set({
-      id: arte.id,
-      name: arte.name,
-      tipoarte: tipos.find((t) => t.name === arte.tipoarte) ?? null,
-      description: arte.description,
-      foto: arte.foto
-    });
   }
 
   delete(id?: number) {
@@ -70,16 +50,6 @@ export class arteService {
 
     this.artes.set(this.artes().filter((arte) => arte.id !== id));
     this.persistArtes();
-  }
-
-  resetForm(formModel: any) {
-    formModel.set({
-      id: undefined,
-      name: '',
-      tipoarte: null,
-      description: '',
-      foto: ''
-    });
   }
 
   private persistArtes() {

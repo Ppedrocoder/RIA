@@ -1,4 +1,4 @@
-import { Component, input, output } from '@angular/core';
+import { Component, effect, inject, input, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { InputTextModule } from 'primeng/inputtext';
@@ -9,7 +9,9 @@ import { SelectModule } from 'primeng/select';
 import { DividerModule } from 'primeng/divider';
 import { FormField } from '@angular/forms/signals';
 import { FormActions } from '../form-actions/form-actions';
-import { Input } from '@angular/core';
+import { Arte, TipoArte } from '../app';
+import { form, required } from '@angular/forms/signals';
+import { ArteService } from '../services/service';
 
 @Component({
   selector: 'app-form',
@@ -80,16 +82,50 @@ import { Input } from '@angular/core';
   styleUrl: './form.css',
 })
 export class Form {
-  @Input() formAtelie: any;
-  tipos = input<any[]>();
-  save = output<void>();
-  resetForm = output<void>();
+  tipos = input<TipoArte[]>();
+  arteToEdit = input<Arte | null>(null);
+
+  private readonly arteService = inject(ArteService);
+  private readonly formModel = signal<Arte>({
+    id: undefined,
+    name: '',
+    tipoarte: null,
+    description: '',
+    foto: '',
+  });
+
+  formAtelie = form(this.formModel, (schemaPath) => {
+    required(schemaPath.name, { message: 'O nome é obrigatório.' });
+    required(schemaPath.tipoarte, { message: 'O tipo é obrigatório.' });
+    required(schemaPath.description, { message: 'A descrição é obrigatória.' });
+    required(schemaPath.foto, { message: 'A foto é obrigatória.' });
+  });
+
+  constructor() {
+    effect(() => {
+      const arte = this.arteToEdit();
+      if (arte) {
+        this.formModel.set({ ...arte });
+      }
+    });
+  }
 
   onSave() {
-    this.save.emit();
+    this.arteService.save(this.formModel());
+    this.resetForm();
   }
 
   onResetForm() {
-    this.resetForm.emit();
+    this.resetForm();
+  }
+
+  private resetForm() {
+    this.formModel.set({
+      id: undefined,
+      name: '',
+      tipoarte: null,
+      description: '',
+      foto: '',
+    });
   }
 }
