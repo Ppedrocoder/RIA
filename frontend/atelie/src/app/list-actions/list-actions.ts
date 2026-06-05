@@ -16,7 +16,7 @@ import { Arte } from '../app';
   styleUrl: './list-actions.css',
 })
 export class ListActions {
-  a = input<any>();
+  a = input.required<Arte>();
   edit = output<Arte>();
   delete = output<number>();
 
@@ -24,7 +24,9 @@ export class ListActions {
     this.edit.emit(art);
   }
 
-  onDelete(id: number) {
+  onDelete(id?: number) {
+    if (!id) return;
+
     this.delete.emit(id);
   }
 }
