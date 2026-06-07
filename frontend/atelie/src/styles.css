@@ -2,3 +2,6 @@
 
 @import 'tailwindcss';
 @import 'primeicons/primeicons.css';
+* {
+  font-family: 'Inter', sans-serif;
+}
