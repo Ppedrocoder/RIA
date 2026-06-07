@@ -18,7 +18,7 @@ import { FieldsetModule } from 'primeng/fieldset';
   </div>
   <div class="mb-4 p-8 flex items-center justify-center flex-col">
     <h1 class="text-3xl font-bold mb-4">{{ arte()?.name }}</h1>
-    <img [src]="arte()?.foto" alt="{{ arte()?.name }}" class="max-h-96 w-auto object-contain mb-4" />
+    <img [src]="arte()?.foto" alt="{{ arte()?.name }}" class="max-h-96 w-auto object-contain mb-4 rounded-lg" />
     <div class="card mb-4">
             <p-fieldset legend="Descrição">
                 <p class="m-0">

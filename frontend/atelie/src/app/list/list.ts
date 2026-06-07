@@ -15,7 +15,7 @@ import { Arte } from '../app';
       <div class="mb-4 p-8 flex items-center justify-center">
             <p-card [style]="{ width: '25rem', overflow: 'hidden' }">
                 <ng-template #header>
-                    <img alt="Card" class="w-full" [src]="a.foto" [alt]="a.name" />
+                    <img alt="Card" class="w-full rounded-lg" [src]="a.foto" [alt]="a.name" />
                 </ng-template>
                 <ng-template #title> {{ a.name }} </ng-template>
                 <ng-template #subtitle> {{ typeof a.tipoarte === 'string' ? a.tipoarte : a.tipoarte?.name }} </ng-template>
