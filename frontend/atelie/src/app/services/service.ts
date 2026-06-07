@@ -14,7 +14,10 @@ export class ArteService {
   getArtes() {
     return this.artes();
   }
-
+  getArteById(id?: number) {
+    if (!id) return null;
+    return this.artes().find((arte) => arte.id === id) || null;
+  }
   loadArtes() {
     const storedArtes = localStorage.getItem(this.storageKey);
 
