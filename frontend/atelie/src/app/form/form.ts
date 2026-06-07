@@ -65,7 +65,7 @@ import { ArteService } from '../services/service';
         <div class="grid grid-cols-1 md:grid-cols-1 gap-1">
             <p-iftalabel>
                 <input pInputText id="foto" [formField]="formAtelie.foto" autocomplete="off" />
-                <label for="foto">Foto</label>
+                <label for="foto">Foto (URL)</label>
             </p-iftalabel>
             @if (formAtelie.foto().invalid()) {
               <ul>
