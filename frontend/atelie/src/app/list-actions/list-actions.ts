@@ -14,7 +14,7 @@ import { Router, RouterModule } from "@angular/router";
         <div class="flex gap-6 justify-center w-full">
         <p-button label="Excluir" severity="secondary" [outlined]="true" class="w-full" styleClass="w-full" (click)="onDelete(a().id)" />
         <p-button label="Visualizar" severity="contrast" [outlined]="true" class="w-full" styleClass="w-full" (click)="onView(a().id)" />
-        <p-button label="Editar" [outlined]="true" class="w-full" styleClass="w-full" (click)="onEdit(a())" />
+        <p-button label="Editar" [outlined]="true" class="w-full" styleClass="w-full" (click)="onEdit(a().id)" />
         </div>
     </div>
   ` ,
@@ -25,8 +25,8 @@ export class ListActions {
   edit = output<Arte>();
   delete = output<number>();
 
-  onEdit(art: Arte) {
-    this.edit.emit(art);
+  onEdit(id?: number) {
+    this.router.navigate(['edit', id]);
   }
 
   onDelete(id?: number) {
