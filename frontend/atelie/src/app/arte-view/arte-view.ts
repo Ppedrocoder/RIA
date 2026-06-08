@@ -1,4 +1,4 @@
-import { Component, computed, input } from '@angular/core';
+import { Component, computed, input, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { DividerModule } from 'primeng/divider';
 import { ArteService } from '../services/service';
@@ -40,7 +40,7 @@ import { FieldsetModule } from 'primeng/fieldset';
   ` ,
   styleUrl: './arte-view.css',
 })
-export class ArteView {
+export class ArteView implements OnInit{
   arteService = inject(ArteService);
   artes = this.arteService.getArtes();
   private route = inject(ActivatedRoute);
@@ -49,9 +49,9 @@ export class ArteView {
     const id = Number(this.id);
     return this.arteService.getArteById(id);
   });
-  constructor() {
+  ngOnInit(): void {
     this.arteService.loadArtes();
-  }
+  } 
   get tipoArteNome(): string {
     const tipo = this.arte()?.tipoarte;
     if (!tipo) return '';

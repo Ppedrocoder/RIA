@@ -1,4 +1,4 @@
-import { Component, computed, inject, signal, effect } from '@angular/core';
+import { Component, computed, inject, signal, effect, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { InputTextModule } from 'primeng/inputtext';
@@ -116,7 +116,7 @@ import { Arte } from '../app';
     </p-divider>
   `,
 })
-export class Edit {
+export class Edit implements OnInit {
   private arteService = inject(ArteService);
   private tipoArteService = inject(TipoArteService);
   private route = inject(ActivatedRoute);
@@ -139,7 +139,7 @@ export class Edit {
     required(schemaPath.foto, { message: 'A foto é obrigatória.' });
   });
 
-  constructor() {
+  ngOnInit() {
     this.arteService.loadArtes();
     this.tipoArteService.setTipos([
       { name: 'Pintura' }, { name: 'Escultura' },

@@ -20,7 +20,6 @@ import { RouterModule } from "@angular/router";
   <p-divider align="center" class="mt-4">
     <h2 class="text-2xl font-bold m-4">Feito por: Pedro Ricardo</h2>
   </p-divider>
-  <router-outlet></router-outlet>
   `,
   styleUrl: './home.css',
 })
