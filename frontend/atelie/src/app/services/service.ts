@@ -6,7 +6,6 @@ import { Arte } from '../app';
   providedIn: 'root',
 })
 export class ArteService {
-  private readonly storageKey = 'atelie-artes';
   artes = signal<Arte[]>([]);
   
   private nextId = 1;
