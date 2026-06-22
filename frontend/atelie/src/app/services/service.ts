@@ -1,60 +1,45 @@
 import { Injectable, signal } from '@angular/core';
 import { Arte } from '../app';
+import { HttpClient } from '@angular/common/http';
 
 
 @Injectable({
   providedIn: 'root',
 })
 export class ArteService {
+  private apiUrl = 'http://localhost:3000/artes';
+  constructor(private http: HttpClient){}
   artes = signal<Arte[]>([]);
   
-  private nextId = 1;
-  
   getArtes() {
-    return this.artes();
+    return this.http.get<Arte[]>(this.apiUrl).subscribe((data) => {
+      this.artes.set(data);
+    });
   }
   getArteById(id?: number) {
     if (!id) return null;
     return this.artes().find((arte) => arte.id === id) || null;
   }
-  loadArtes() {
-    const storedArtes = localStorage.getItem(this.storageKey);
 
-    if (!storedArtes) {
-      this.artes.set([]);
-      this.nextId = 1;
-      return;
-    }
-
-    try {
-      this.artes.set(JSON.parse(storedArtes) as Arte[]);
-      const current = this.artes();
-      this.nextId = current.reduce((maxId, arte) => Math.max(maxId, arte.id ?? 0), 0) + 1;
-    } catch {
-      this.artes.set([]);
-      this.nextId = 1;
-    }
-  }
   save(arteToSave: Arte) {
-    const current = this.artes();
-    if (arteToSave.id !== undefined) {
-      this.artes.set(current.map((arte) => (arte.id === arteToSave.id ? { ...arte, ...arteToSave } : arte)));
-    } else {
-      this.artes.set([...current, { ...arteToSave, id: this.nextId }]);
-      this.nextId += 1;
-    }
-
-    this.persistArtes();
+    this.http.post<Arte>(this.apiUrl, arteToSave).subscribe((savedArte) => {
+      this.artes.update((artes) => [...artes, savedArte]);
+    });
   }
 
   delete(id?: number) {
     if (!id) return;
-
-    this.artes.set(this.artes().filter((arte) => arte.id !== id));
-    this.persistArtes();
+    this.http.delete(`${this.apiUrl}/${id}`).subscribe(() => {
+      this.artes.update((artes) => artes.filter((arte) => arte.id !== id));
+    });
   }
 
-  private persistArtes() {
-    localStorage.setItem(this.storageKey, JSON.stringify(this.artes()));
+  edit(arteToEdit: Arte) {
+    if (!this.getArteById(arteToEdit.id)) return;
+    this.http.put<Arte>(`${this.apiUrl}/${arteToEdit.id}`, arteToEdit).subscribe((updatedArte) => {
+      this.artes.update((artes) =>
+        artes.map((arte) => (arte.id === updatedArte.id ? updatedArte : arte))
+      );
+    });
   }
 }
