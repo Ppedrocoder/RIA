@@ -36,7 +36,7 @@ export class ArteService {
 
   edit(arteToEdit: Arte) {
     if (!this.getArteById(arteToEdit.id)) return;
-    this.http.put<Arte>(`${this.apiUrl}/${arteToEdit.id}`, arteToEdit).subscribe((updatedArte) => {
+    this.http.patch<Arte>(`${this.apiUrl}/${arteToEdit.id}`, arteToEdit).subscribe((updatedArte) => {
       this.artes.update((artes) =>
         artes.map((arte) => (arte.id === updatedArte.id ? updatedArte : arte))
       );
