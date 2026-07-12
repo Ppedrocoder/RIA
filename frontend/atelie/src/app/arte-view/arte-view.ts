@@ -42,15 +42,18 @@ import { FieldsetModule } from 'primeng/fieldset';
 })
 export class ArteView implements OnInit{
   arteService = inject(ArteService);
-  artes = this.arteService.getArtes();
+  artes = computed(() => this.arteService.getArtes());
   private route = inject(ActivatedRoute);
   id: string | null = this.route.snapshot.paramMap.get('id');
   arte = computed(() => {
     const id = Number(this.id);
     return this.arteService.getArteById(id);
   });
+
   ngOnInit(): void {
+    const id = Number(this.id);
     this.arteService.loadArtes();
+    this.arteService.loadArteById(id);
   } 
   get tipoArteNome(): string {
     const tipo = this.arte()?.tipoarte;

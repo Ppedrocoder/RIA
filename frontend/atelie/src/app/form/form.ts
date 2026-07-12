@@ -111,8 +111,7 @@ export class Form {
   }
 
   onSave() {
-    this.arteService.save(this.formModel());
-    this.resetForm();
+    this.arteService.save(this.formModel(), () => this.resetForm());
   }
 
   onResetForm() {

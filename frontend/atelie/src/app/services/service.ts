@@ -1,61 +1,129 @@
 import { Injectable, signal } from '@angular/core';
 import { Arte } from '../app';
+import { HttpClient } from '@angular/common/http';
+import { MessageService } from 'primeng/api';
+import { HttpErrorResponse } from '@angular/common/http';
 
 
 @Injectable({
   providedIn: 'root',
 })
 export class ArteService {
-  private readonly storageKey = 'atelie-artes';
+  private apiUrl = 'http://localhost:8000/api/logica/artes';
+  constructor(
+    private http: HttpClient,
+    private messageService: MessageService,
+  ){}
   artes = signal<Arte[]>([]);
-  
-  private nextId = 1;
   
   getArtes() {
     return this.artes();
   }
+
+  loadArtes() {
+    return this.http.get<Arte[]>(this.apiUrl).subscribe({
+      next: (data) => {
+        this.artes.set(data);
+      },
+      error: (error: HttpErrorResponse) => {
+        this.showError('Nao foi possivel carregar as artes.', error);
+      },
+    });
+  }
+
   getArteById(id?: number) {
     if (!id) return null;
     return this.artes().find((arte) => arte.id === id) || null;
   }
-  loadArtes() {
-    const storedArtes = localStorage.getItem(this.storageKey);
 
-    if (!storedArtes) {
-      this.artes.set([]);
-      this.nextId = 1;
-      return;
-    }
-
-    try {
-      this.artes.set(JSON.parse(storedArtes) as Arte[]);
-      const current = this.artes();
-      this.nextId = current.reduce((maxId, arte) => Math.max(maxId, arte.id ?? 0), 0) + 1;
-    } catch {
-      this.artes.set([]);
-      this.nextId = 1;
-    }
-  }
-  save(arteToSave: Arte) {
-    const current = this.artes();
-    if (arteToSave.id !== undefined) {
-      this.artes.set(current.map((arte) => (arte.id === arteToSave.id ? { ...arte, ...arteToSave } : arte)));
-    } else {
-      this.artes.set([...current, { ...arteToSave, id: this.nextId }]);
-      this.nextId += 1;
-    }
-
-    this.persistArtes();
+  loadArteById(id: number) {
+    return this.http.get<Arte>(`${this.apiUrl}/${id}`).subscribe({
+      next: (arte) => {
+        const exists = this.getArteById(id);
+        if (exists) {
+          this.artes.update((artes) =>
+            artes.map((item) => (item.id === arte.id ? arte : item))
+          );
+          return;
+        }
+        this.artes.update((artes) => [...artes, arte]);
+      },
+      error: (error: HttpErrorResponse) => {
+        this.showError('Nao foi possivel carregar a arte.', error);
+      },
+    });
   }
 
-  delete(id?: number) {
+  save(arteToSave: Arte, onSuccess?: () => void) {
+    this.http.post<Arte>(this.apiUrl, arteToSave).subscribe({
+      next: (savedArte) => {
+        this.artes.update((artes) => [...artes, savedArte]);
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Sucesso',
+          detail: 'Arte criada com sucesso.',
+        });
+        onSuccess?.();
+      },
+      error: (error: HttpErrorResponse) => {
+        this.showError('Nao foi possivel criar a arte.', error);
+      },
+    });
+  }
+
+  delete(id?: number, onSuccess?: () => void) {
     if (!id) return;
-
-    this.artes.set(this.artes().filter((arte) => arte.id !== id));
-    this.persistArtes();
+    this.http.delete(`${this.apiUrl}/${id}`).subscribe({
+      next: () => {
+        this.artes.update((artes) => artes.filter((arte) => arte.id !== id));
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Sucesso',
+          detail: 'Arte excluida com sucesso.',
+        });
+        onSuccess?.();
+      },
+      error: (error: HttpErrorResponse) => {
+        this.showError('Nao foi possivel excluir a arte.', error);
+      },
+    });
   }
 
-  private persistArtes() {
-    localStorage.setItem(this.storageKey, JSON.stringify(this.artes()));
+  edit(arteToEdit: Arte, onSuccess?: () => void) {
+    if (!arteToEdit.id) return;
+    this.http.patch<Arte>(`${this.apiUrl}/${arteToEdit.id}`, arteToEdit).subscribe({
+      next: (updatedArte) => {
+        const exists = this.getArteById(updatedArte.id);
+        if (exists) {
+          this.artes.update((artes) =>
+            artes.map((arte) => (arte.id === updatedArte.id ? updatedArte : arte))
+          );
+        } else {
+          this.artes.update((artes) => [...artes, updatedArte]);
+        }
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Sucesso',
+          detail: 'Arte atualizada com sucesso.',
+        });
+        onSuccess?.();
+      },
+      error: (error: HttpErrorResponse) => {
+        this.showError('Nao foi possivel atualizar a arte.', error);
+      },
+    });
+  }
+
+  private showError(detail: string, error: HttpErrorResponse) {
+    const apiMessage =
+      typeof error.error === 'object' && error.error && 'error' in error.error
+        ? String(error.error.error)
+        : '';
+
+    this.messageService.add({
+      severity: 'error',
+      summary: 'Erro',
+      detail: apiMessage ? `${detail} ${apiMessage}` : detail,
+    });
   }
 }
