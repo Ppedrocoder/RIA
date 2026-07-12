@@ -1,6 +1,11 @@
 from typing import Optional
 from ninja import Schema
+from pydantic import EmailStr
 
+class RegistroUsuarioSchema(Schema):
+    username: str
+    email: EmailStr
+    password: str
 
 class TipoArteSchema(Schema):
     id: Optional[int] = None
