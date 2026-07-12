@@ -121,6 +121,9 @@ export class Edit implements OnInit {
   private tipoArteService = inject(TipoArteService);
   private route = inject(ActivatedRoute);
   private router = inject(Router);
+  private routeId = Number(this.route.snapshot.paramMap.get('id'));
+
+  private currentArte = computed(() => this.arteService.getArteById(this.routeId));
 
   tipos = computed(() => this.tipoArteService.getTipos());
 
@@ -139,23 +142,23 @@ export class Edit implements OnInit {
     required(schemaPath.foto, { message: 'A foto é obrigatória.' });
   });
 
+  constructor() {
+    effect(() => {
+      const arte = this.currentArte();
+      if (arte) {
+        this.formModel.set({ ...arte });
+      }
+    });
+  }
+
   ngOnInit() {
     this.arteService.loadArtes();
-    this.tipoArteService.setTipos([
-      { name: 'Pintura' }, { name: 'Escultura' },
-      { name: 'Fotografia' }, { name: 'Desenho' }, { name: 'Cerâmica' }
-    ]);
-
-    const id = Number(this.route.snapshot.paramMap.get('id'));
-    const arte = this.arteService.getArteById(id);
-    if (arte) {
-      this.formModel.set({ ...arte });
-    }
+    this.tipoArteService.loadTipos();
+    this.arteService.loadArteById(this.routeId);
   }
 
   onSave() {
     if (this.formAtelie().invalid()) return;
-    this.arteService.save(this.formModel());
-    this.router.navigate(['/']);
+    this.arteService.edit(this.formModel(), () => this.router.navigate(['/']));
   }
 }

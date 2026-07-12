@@ -30,9 +30,10 @@ export class Home {
   arteSelecionada = signal<Arte | null>(null);
   artes = computed(() => this.arteService.getArtes());
   tipos = computed(() => this.tipoArteService.getTipos());
+
   ngOnInit(): void {
     this.arteService.loadArtes();
-    this.tipoArteService.setTipos([ { name: 'Pintura' }, { name: 'Escultura' }, { name: 'Fotografia' }, { name: 'Desenho' }, { name: 'Cerâmica' } ]);
+    this.tipoArteService.loadTipos();
   }
 
   onEdit(arte: Arte) {
